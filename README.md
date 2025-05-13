@@ -13,6 +13,4 @@ An interactive browser-based Vesak Thorana display featuring:
 2. Open `index.html` in any modern browser  
 3. Enjoy the visual & audio experience  
 
-## License
 
-*Add your license here (e.g. MIT)*  
