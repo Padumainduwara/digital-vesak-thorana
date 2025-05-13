@@ -1,17 +1,25 @@
+/* Base reset and box-sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
 html, body {
   margin: 0;
   padding: 0;
   overflow: hidden;
   background: #111;
   font-family: sans-serif;
+  height: 100%;
 }
 
-/* Hide native audio UI */
+/* Hide native audio controls */
 audio#bg-music {
   display: none;
 }
 
-/* Main canvas */
+/* Fullscreen canvas */
 canvas {
   position: fixed;
   top: 0; left: 0;
@@ -20,21 +28,21 @@ canvas {
   z-index: 2;
 }
 
-/* Elephants */
+/* Elephants – responsive size & position */
 #elephant-left,
 #elephant-right {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  width: 5vw;
+  width: clamp(40px, 10vw, 80px);
   opacity: 0.7;
   pointer-events: none;
   z-index: 3;
 }
-#elephant-left  { left: 4vw; }
-#elephant-right { right: 4vw; }
+#elephant-left  { left: clamp(8px, 4vw, 32px); }
+#elephant-right { right: clamp(8px, 4vw, 32px); }
 
-/* Modal overlay */
+/* Modal overlay – hidden by default */
 #panel-modal {
   display: none;
   position: fixed;
@@ -46,14 +54,15 @@ canvas {
 }
 #panel-modal .modal-content {
   position: relative;
-  max-width: 80vw;
-  max-height: 80vh;
+  max-width: 90vw;
+  max-height: 90vh;
   text-align: center;
 }
 #modal-close {
   position: absolute;
-  top: 10px; right: 10px;
-  font-size: 2rem;
+  top: clamp(8px, 3vw, 16px);
+  right: clamp(8px, 3vw, 16px);
+  font-size: clamp(1.5rem, 4vw, 2rem);
   color: #fff;
   cursor: pointer;
 }
@@ -63,34 +72,34 @@ canvas {
 }
 #modal-caption {
   color: #fff;
-  margin-top: 15px;
-  font-size: 1.2rem;
+  margin-top: clamp(8px, 2vw, 16px);
+  font-size: clamp(1rem, 3vw, 1.2rem);
 }
 
-/* Logo bottom-right */
+/* Logo – bottom-right, responsive */
 #logo {
   position: fixed;
-  bottom: 10px;
-  right: 20px;
-  width: 200px;
+  bottom: clamp(40px, 10vh, 60px);
+  right: clamp(12px, 4vw, 20px);
+  width: clamp(80px, 20vw, 200px);
   z-index: 4;
   animation: fade 8s ease-in-out infinite;
   cursor: pointer;
 }
 @keyframes fade {
-  0%,100% { opacity: 0.6; }
-  50%     { opacity: 1;   }
+  0%, 100% { opacity: 0.6; }
+  50%      { opacity: 1;   }
 }
 #logo:hover {
   animation-play-state: paused;
 }
 
-/* Footer credit */
+/* Footer credit – bottom-right, responsive */
 #footer {
   position: fixed;
-  bottom: 40px;
-  right: 20px;
-  font-size: 1rem;
+  bottom: clamp(20px, 5vh, 40px);
+  right: clamp(12px, 4vw, 20px);
+  font-size: clamp(0.75rem, 2vw, 1rem);
   color: #fff;
   opacity: 0.6;
   pointer-events: none;

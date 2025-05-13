@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Digital Vesak Thorana</title>
   <link rel="stylesheet" href="style.css" />
-  <!-- GSAP for smooth animations -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
 </head>
 <body>
@@ -28,9 +27,12 @@
       <p id="modal-caption"></p>
     </div>
   </div>
-  <!-- Logo and Credit -->
-  <img id="logo" src="assets/logo.png" alt="Axiora Labs Logo">
-  <div id="footer">Designed by Axiora Labs</div>
+
+  <!-- Centered Logo + Credit -->
+  <div id="branding">
+    <img id="logo" src="assets/logo.png" alt="Axiora Labs Logo">
+    <div id="footer">Designed by Axiora Labs</div>
+  </div>
 
   <script>
     // Background music setup
@@ -45,11 +47,10 @@
     });
 
     // Canvas & GSAP animation
-    const canvas = document.getElementById('thoran');
-    const ctx = canvas.getContext('2d');
-
+    const canvas = document.getElementById('thoran'),
+          ctx    = canvas.getContext('2d');
     function resize() {
-      canvas.width = window.innerWidth;
+      canvas.width  = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     window.addEventListener('resize', resize);
@@ -120,14 +121,14 @@
         const y = cy + Math.sin(theta)*panelRad;
         ctx.save();
           ctx.beginPath();
-          ctx.arc(x,y,panelSz*1.1,0,Math.PI*2);
+          ctx.arc(x, y, panelSz*1.1, 0, Math.PI*2);
           ctx.fillStyle = '#222';
           ctx.fill();
           ctx.lineWidth = 4;
           ctx.strokeStyle = '#fff';
           ctx.stroke();
           ctx.beginPath();
-          ctx.arc(x,y,panelSz,0,Math.PI*2);
+          ctx.arc(x, y, panelSz, 0, Math.PI*2);
           ctx.clip();
           ctx.drawImage(img, x-panelSz, y-panelSz, panelSz*2, panelSz*2);
         ctx.restore();
@@ -155,12 +156,12 @@
     // Panel click → modal
     canvas.addEventListener('click', e => {
       const rect = canvas.getBoundingClientRect();
-      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-      const cx = canvas.width/2, cy = canvas.height/2;
-      const dx = mx - cx, dy = my - cy;
-      const dist = Math.hypot(dx,dy);
-      const maxR = Math.min(cx,cy)*0.9;
-      const panelRad = maxR*0.65, panelSz = maxR*0.20;
+      const mx   = e.clientX - rect.left, my = e.clientY - rect.top;
+      const cx   = canvas.width/2, cy = canvas.height/2;
+      const dx   = mx - cx, dy = my - cy;
+      const dist = Math.hypot(dx, dy);
+      const maxR = Math.min(cx, cy) * 0.9;
+      const panelRad = maxR * 0.65, panelSz = maxR * 0.20;
       if (dist > panelRad-panelSz && dist < panelRad+panelSz) {
         let angle = Math.atan2(dy,dx) - panelAngle;
         angle = (angle%(2*Math.PI)+(2*Math.PI))%(2*Math.PI);
@@ -171,12 +172,11 @@
 
     function showModal(i) {
       const modal = document.getElementById('panel-modal');
-      document.getElementById('modal-img').src = paths[i+1];
+      document.getElementById('modal-img').src        = paths[i+1];
       document.getElementById('modal-caption').textContent = `Sathsathiya ${i+1}`;
       modal.style.display = 'flex';
     }
-    document.getElementById('modal-close')
-            .addEventListener('click', () => {
+    document.getElementById('modal-close').addEventListener('click', () => {
       document.getElementById('panel-modal').style.display = 'none';
     });
   </script>
