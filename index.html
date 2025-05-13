@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="si">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Digital Vesak Thorana</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- GSAP for smooth animations -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.11.5/gsap.min.js"></script>
+</head>
+<body>
+
+  <!-- Background Music -->
+  <audio id="bg-music" src="assets/background.mp3"></audio>
+
+  <!-- Flanking Elephants -->
+  <img id="elephant-left"  src="assets/elephant-left.png"  alt="Elephant Left">
+  <img id="elephant-right" src="assets/elephant-right.png" alt="Elephant Right">
+
+  <!-- Main Canvas -->
+  <canvas id="thoran"></canvas>
+
+  <!-- Modal for panel details -->
+  <div id="panel-modal">
+    <div class="modal-content">
+      <span id="modal-close">&times;</span>
+      <img id="modal-img" src="" alt="Panel View">
+      <p id="modal-caption"></p>
+    </div>
+  </div>
+  <!-- Logo and Credit -->
+  <img id="logo" src="assets/logo.png" alt="Axiora Labs Logo">
+  <div id="footer">Designed by Axiora Labs</div>
+
+  <script>
+    // Background music setup
+    window.addEventListener('load', () => {
+      const music = document.getElementById('bg-music');
+      music.volume = 0.45;
+      music.play().catch(e => console.warn('Autoplay blocked:', e));
+      music.addEventListener('ended', () => {
+        music.currentTime = 0;
+        music.play();
+      });
+    });
+
+    // Canvas & GSAP animation
+    const canvas = document.getElementById('thoran');
+    const ctx = canvas.getContext('2d');
+
+    function resize() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    const buddhistColors = ['#0A369D','#F4C430','#E03C31','#FFFFFF','#00843D','#FF8C00'];
+    const paths = [
+      'assets/buddha.png',
+      'assets/Sathsathiya1.png',
+      'assets/Sathsathiya2.png',
+      'assets/Sathsathiya3.png',
+      'assets/Sathsathiya4.png',
+      'assets/Sathsathiya5.png',
+      'assets/Sathsathiya6.png',
+      'assets/Sathsathiya7.png'
+    ];
+    const images = [];
+    let loaded = 0;
+    paths.forEach(src => {
+      const img = new Image();
+      img.src = src;
+      img.onload = () => {
+        if (++loaded === paths.length) initAnimation();
+      };
+      images.push(img);
+    });
+
+    let petalAngle = 0, panelAngle = 0;
+    const petalSpeed = 0.0008, panelSpeed = 0.0006;
+
+    function draw() {
+      const W = canvas.width, H = canvas.height;
+      const cx = W/2, cy = H/2, maxR = Math.min(cx, cy) * 0.9;
+
+      // Background & halo
+      ctx.fillStyle = '#000';
+      ctx.fillRect(0, 0, W, H);
+      ctx.beginPath();
+      ctx.arc(cx, cy, maxR*0.95, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(255,255,255,0.03)';
+      ctx.fill();
+
+      // Petal rings
+      for (let r = 1; r <= 6; r++) {
+        const rad = (r/6)*maxR;
+        ctx.fillStyle = buddhistColors[(r-1)%buddhistColors.length];
+        for (let i = 0; i < 40; i++) {
+          const theta = (i/40)*Math.PI*2 + petalAngle*r;
+          const x = cx + Math.cos(theta)*rad;
+          const y = cy + Math.sin(theta)*rad;
+          ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(theta + petalAngle*0.2);
+            ctx.beginPath();
+            ctx.moveTo(0,0);
+            ctx.bezierCurveTo(10,-20,30,-20,40,0);
+            ctx.closePath();
+            ctx.fill();
+          ctx.restore();
+        }
+      }
+
+      // Rotating panels
+      const panelRad = maxR * 0.65, panelSz = maxR * 0.20;
+      images.slice(1).forEach((img, i) => {
+        const theta = (i/7)*Math.PI*2 + panelAngle;
+        const x = cx + Math.cos(theta)*panelRad;
+        const y = cy + Math.sin(theta)*panelRad;
+        ctx.save();
+          ctx.beginPath();
+          ctx.arc(x,y,panelSz*1.1,0,Math.PI*2);
+          ctx.fillStyle = '#222';
+          ctx.fill();
+          ctx.lineWidth = 4;
+          ctx.strokeStyle = '#fff';
+          ctx.stroke();
+          ctx.beginPath();
+          ctx.arc(x,y,panelSz,0,Math.PI*2);
+          ctx.clip();
+          ctx.drawImage(img, x-panelSz, y-panelSz, panelSz*2, panelSz*2);
+        ctx.restore();
+      });
+
+      // Central Buddha
+      const bR = maxR * 0.35;
+      ctx.save();
+        ctx.beginPath();
+        ctx.arc(cx, cy, bR, 0, Math.PI*2);
+        ctx.clip();
+        ctx.drawImage(images[0], cx-bR, cy-bR, bR*2, bR*2);
+      ctx.restore();
+    }
+
+    function initAnimation() {
+      gsap.ticker.fps(60);
+      gsap.ticker.add(() => {
+        petalAngle += petalSpeed;
+        panelAngle += panelSpeed;
+        draw();
+      });
+    }
+
+    // Panel click → modal
+    canvas.addEventListener('click', e => {
+      const rect = canvas.getBoundingClientRect();
+      const mx = e.clientX - rect.left, my = e.clientY - rect.top;
+      const cx = canvas.width/2, cy = canvas.height/2;
+      const dx = mx - cx, dy = my - cy;
+      const dist = Math.hypot(dx,dy);
+      const maxR = Math.min(cx,cy)*0.9;
+      const panelRad = maxR*0.65, panelSz = maxR*0.20;
+      if (dist > panelRad-panelSz && dist < panelRad+panelSz) {
+        let angle = Math.atan2(dy,dx) - panelAngle;
+        angle = (angle%(2*Math.PI)+(2*Math.PI))%(2*Math.PI);
+        const idx = Math.floor(angle/(2*Math.PI)*7);
+        showModal(idx);
+      }
+    });
+
+    function showModal(i) {
+      const modal = document.getElementById('panel-modal');
+      document.getElementById('modal-img').src = paths[i+1];
+      document.getElementById('modal-caption').textContent = `Sathsathiya ${i+1}`;
+      modal.style.display = 'flex';
+    }
+    document.getElementById('modal-close')
+            .addEventListener('click', () => {
+      document.getElementById('panel-modal').style.display = 'none';
+    });
+  </script>
+
+</body>
+</html>
